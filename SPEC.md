@@ -1,29 +1,26 @@
-# PayTrack Dashboard — Frontend Specification
+# PayTrack Dashboard - Frontend Specification
 
 ## Project Overview
 
-PayTrack Dashboard is a simple portfolio-ready POS transaction dashboard built with ReactJS, TypeScript, and Tailwind CSS.
+PayTrack Dashboard is a portfolio-ready POS transaction dashboard built with React, TypeScript, Vite, Tailwind CSS, React Router DOM, and mock data.
 
-The goal of this first milestone is to build the frontend UI only. Backend, database, authentication logic, and real API integration will be added later.
+The first milestone is frontend UI only. Backend, database, real authentication, JWT logic, and API integration are planned for later.
 
-This project should look clean, professional, and suitable for a junior full-stack developer portfolio.
+The UI should feel clean, professional, responsive, and appropriate for a junior full-stack developer portfolio.
 
 ---
 
 ## Tech Stack
 
-Use the following stack:
-
-- ReactJS
+- React
 - TypeScript
 - Vite
 - Tailwind CSS
 - React Router DOM
-- Mock data for now
+- Mock transaction data
 
 Do not add a backend yet.
-
-Do not add complex state management libraries like Redux or Zustand for this stage.
+Do not add complex state management libraries such as Redux or Zustand for this stage.
 
 ---
 
@@ -33,22 +30,23 @@ Build a responsive dashboard UI that includes:
 
 1. Login page
 2. Dashboard summary cards
-3. Transaction list page
-4. Search transactions
-5. Filter transactions by payment status
-6. Transaction details page
-7. Add test transaction page
-8. Basic role display: admin, merchant, support
+3. Dashboard charts for transaction volume, amount, and payment statuses
+4. Transaction list page
+5. Search transactions
+6. Filter transactions by payment status
+7. Transaction details page
+8. Add test transaction modal inside the Transactions page
+9. Paginated transaction table
+10. Basic role display: admin, merchant, support
+11. Mock logout action
 
 ---
 
 ## Development Rules
 
-Follow these rules strictly:
-
 - Keep the project simple and beginner-friendly.
 - Use small reusable components.
-- Use TypeScript interfaces for data types.
+- Use TypeScript interfaces and types for data shapes.
 - Use Tailwind CSS for styling.
 - Use mock data stored in a separate file.
 - Use React Router for page navigation.
@@ -61,160 +59,158 @@ Follow these rules strictly:
 
 ---
 
-## Recommended Folder Structure
-
-Create this structure inside the `src` folder:
+## Current Folder Structure
 
 ```txt
 src/
-├── assets/
-├── components/
-│   ├── layout/
-│   │   ├── Sidebar.tsx
-│   │   ├── Header.tsx
-│   │   └── AppLayout.tsx
-│   ├── dashboard/
-│   │   └── SummaryCard.tsx
-│   ├── transactions/
-│   │   ├── TransactionTable.tsx
-│   │   ├── TransactionStatusBadge.tsx
-│   │   └── TransactionFilters.tsx
-│   └── common/
-│       └── Button.tsx
-├── data/
-│   └── mockTransactions.ts
-├── pages/
-│   ├── LoginPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── TransactionsPage.tsx
-│   ├── TransactionDetailsPage.tsx
-│   └── AddTransactionPage.tsx
-├── routes/
-│   └── AppRoutes.tsx
-├── types/
-│   └── transaction.ts
-├── utils/
-│   └── formatCurrency.ts
-├── App.tsx
-├── main.tsx
-└── index.css
+|-- assets/
+|-- components/
+|   |-- common/
+|   |   `-- Button.tsx
+|   |-- dashboard/
+|   |   |-- StatusBreakdownChart.tsx
+|   |   |-- SummaryCard.tsx
+|   |   `-- TransactionTrendChart.tsx
+|   |-- layout/
+|   |   |-- AppLayout.tsx
+|   |   |-- Header.tsx
+|   |   `-- Sidebar.tsx
+|   `-- transactions/
+|       |-- AddTransactionModal.tsx
+|       |-- TransactionFilters.tsx
+|       |-- TransactionPagination.tsx
+|       |-- TransactionStatusBadge.tsx
+|       `-- TransactionTable.tsx
+|-- data/
+|   `-- mockTransactions.ts
+|-- pages/
+|   |-- DashboardPage.tsx
+|   |-- LoginPage.tsx
+|   |-- TransactionDetailsPage.tsx
+|   `-- TransactionsPage.tsx
+|-- routes/
+|   `-- AppRoutes.tsx
+|-- types/
+|   `-- transaction.ts
+|-- utils/
+|   |-- dashboardCharts.ts
+|   `-- formatCurrency.ts
+|-- App.tsx
+|-- index.css
+`-- main.tsx
 ```
 
 ---
 
 ## Page Requirements
 
-### 1. Login Page
+### Login Page
 
-File:
-
-```txt
-src/pages/LoginPage.tsx
-```
+File: `src/pages/LoginPage.tsx`
 
 Requirements:
 
-- Display app name: PayTrack Dashboard
-- Email input
-- Password input
-- Login button
-- Simple demo credentials note
-- No real authentication yet
-- On login button click, navigate to `/dashboard`
+- Display app name: PayTrack Dashboard.
+- Include email input.
+- Include password input.
+- Include login button.
+- Show demo credentials note.
+- No real authentication yet.
+- On login form submit, navigate to `/dashboard`.
 
-Suggested demo credentials:
+Demo credentials:
 
 ```txt
 Email: admin@paytrack.com
 Password: password123
 ```
 
----
+### Dashboard Page
 
-### 2. Dashboard Page
-
-File:
-
-```txt
-src/pages/DashboardPage.tsx
-```
+File: `src/pages/DashboardPage.tsx`
 
 Requirements:
 
-Show dashboard summary cards for:
+- Show summary cards for:
+  - Total transactions
+  - Successful payments
+  - Pending payments
+  - Failed payments
+  - Total transaction amount
+- Calculate values from `mockTransactions`.
+- Use `src/components/dashboard/SummaryCard.tsx`.
+- Show one line graph for total transactions by date.
+- Add Year and Month filters near the transactions chart title.
+- Generate Year options dynamically from transaction data, sorted newest to oldest.
+- Include `All Years` in the Year filter.
+- Include `All Months` and January through December in the Month filter.
+- Default the Year filter to the latest available transaction year and Month to `All Months`.
+- Disable Month when `All Years` is selected.
+- Reset Month to `All Months` when Year changes to `All Years`.
+- Aggregate chart data based on filters:
+  - `All Years`: group by year
+  - Specific year and `All Months`: group by month, including zero-value months
+  - Specific year and specific month: group by day, including zero-value days
+- Update the X-axis title based on filters:
+  - `All Years`: Year
+  - Specific year: Month
+  - Specific month: Day
+- Format X-axis labels based on grouping and skip labels when needed to avoid overlap.
+- Keep all chart points hoverable even when some X-axis labels are skipped.
+- Show total transaction amount only in the data point tooltip.
+- Keep only one visible line named `Transactions`.
+- Keep the `Transactions` legend at the bottom/right area of the chart header.
+- Keep the chart card within its dashboard grid column and prevent page-level horizontal overflow.
+- Show a status breakdown for successful, pending, and failed transactions.
 
-- Total transactions
-- Successful payments
-- Pending payments
-- Failed payments
-- Total transaction amount
+### Transactions Page
 
-Use mock transaction data to calculate these values.
-
-Use this component:
-
-```txt
-src/components/dashboard/SummaryCard.tsx
-```
-
----
-
-### 3. Transactions Page
-
-File:
-
-```txt
-src/pages/TransactionsPage.tsx
-```
+File: `src/pages/TransactionsPage.tsx`
 
 Requirements:
 
-- Display a list/table of transactions
-- Include search input
-- Include payment status filter
+- Display a transaction table.
+- Include search input.
+- Include payment status filter.
+- Include pagination controls for the table.
+- Include a rows-per-page control for the table.
 - Allow filtering by:
   - all
   - success
   - pending
   - failed
-- Each transaction row should show:
-  - Transaction ID
-  - Merchant name
-  - Customer name
-  - Amount
-  - Payment method
-  - Status
-  - Date
-  - View details link/button
+- Show an `Add transaction` button aligned with the Transactions page header.
+- Open the add transaction form in a modal.
+- Keep the user on the Transactions page while adding a test transaction.
 
-Use these components:
+Each transaction row should show:
 
-```txt
-src/components/transactions/TransactionTable.tsx
-src/components/transactions/TransactionFilters.tsx
-src/components/transactions/TransactionStatusBadge.tsx
-```
+- Transaction ID
+- Merchant name
+- Customer name
+- Amount
+- Payment method
+- Status
+- Date
+- View details link/button
 
----
+Components:
 
-### 4. Transaction Details Page
+- `src/components/transactions/TransactionTable.tsx`
+- `src/components/transactions/TransactionFilters.tsx`
+- `src/components/transactions/TransactionStatusBadge.tsx`
+- `src/components/transactions/AddTransactionModal.tsx`
 
-File:
+### Transaction Details Page
 
-```txt
-src/pages/TransactionDetailsPage.tsx
-```
+File: `src/pages/TransactionDetailsPage.tsx`
 
-Route:
-
-```txt
-/transactions/:id
-```
+Route: `/transactions/:id`
 
 Requirements:
 
-- Find transaction by ID from mock data
-- Display transaction details:
+- Find transaction by ID from mock data.
+- Display:
   - Transaction ID
   - Merchant name
   - Customer name
@@ -224,30 +220,27 @@ Requirements:
   - Date
   - Reference number
   - User role
-- Show fallback message if transaction is not found
-- Add back button to transactions page
+- Show fallback message if transaction is not found.
+- Include a back button to the Transactions page.
 
----
+### Add Transaction Modal
 
-### 5. Add Transaction Page
-
-File:
-
-```txt
-src/pages/AddTransactionPage.tsx
-```
+File: `src/components/transactions/AddTransactionModal.tsx`
 
 Requirements:
 
-- Create a simple form UI only
-- Fields:
+- Open from the Transactions page `Add transaction` button.
+- Show a form with:
   - Merchant name
   - Customer name
   - Amount
   - Payment method
   - Status
-- On submit, show a simple alert or console log
-- No database saving yet
+- On submit, show an alert or console log.
+- Do not save to a database yet.
+- Close after submit.
+- Close when the user clicks Cancel, the close button, the backdrop, or presses Escape.
+- Focus the first field when opened.
 
 ---
 
@@ -255,86 +248,60 @@ Requirements:
 
 ### App Layout
 
-File:
-
-```txt
-src/components/layout/AppLayout.tsx
-```
+File: `src/components/layout/AppLayout.tsx`
 
 Requirements:
 
-- Used for authenticated dashboard pages
-- Includes Sidebar and Header
-- Main content area should render child pages
-
----
+- Used for dashboard pages.
+- Includes Sidebar and Header.
+- Renders child page content in the main area.
 
 ### Sidebar
 
-File:
-
-```txt
-src/components/layout/Sidebar.tsx
-```
+File: `src/components/layout/Sidebar.tsx`
 
 Navigation links:
 
-- Dashboard → `/dashboard`
-- Transactions → `/transactions`
-- Add Transaction → `/transactions/add`
+- Dashboard -> `/dashboard`
+- Transactions -> `/transactions`
 
----
+The Add Transaction action is not a sidebar tab. It is a button inside the Transactions page header.
 
 ### Header
 
-File:
-
-```txt
-src/components/layout/Header.tsx
-```
+File: `src/components/layout/Header.tsx`
 
 Requirements:
 
-- Show page title or app title
+- Show app title.
 - Show mock logged-in user:
   - Name: Admin User
   - Role: admin
+- Include a logout button.
+- Logout navigates back to `/`.
 
 ---
 
 ## Routing Requirements
 
-File:
-
-```txt
-src/routes/AppRoutes.tsx
-```
-
-Use React Router DOM.
+File: `src/routes/AppRoutes.tsx`
 
 Required routes:
 
 ```txt
-/                     → LoginPage
-/dashboard            → DashboardPage
-/transactions         → TransactionsPage
-/transactions/add     → AddTransactionPage
-/transactions/:id     → TransactionDetailsPage
+/                  -> LoginPage
+/dashboard         -> DashboardPage inside AppLayout
+/transactions      -> TransactionsPage inside AppLayout
+/transactions/add  -> Redirect to /transactions
+/transactions/:id  -> TransactionDetailsPage inside AppLayout
+*                  -> Redirect to /
 ```
-
-Dashboard pages should use `AppLayout`.
 
 ---
 
 ## Data Model
 
-Create this TypeScript type:
-
-File:
-
-```txt
-src/types/transaction.ts
-```
+File: `src/types/transaction.ts`
 
 ```ts
 export type PaymentStatus = "success" | "pending" | "failed";
@@ -360,160 +327,40 @@ export interface Transaction {
 
 ## Mock Data
 
-File:
+File: `src/data/mockTransactions.ts`
 
-```txt
-src/data/mockTransactions.ts
-```
+Requirements:
 
-Create at least 10 sample transactions.
-
-Use realistic POS-related data.
-
-Example:
-
-```ts
-import type { Transaction } from "../types/transaction";
-
-export const mockTransactions: Transaction[] = [
-  {
-    id: "TXN-1001",
-    merchantName: "Dubai Coffee Hub",
-    customerName: "Ahmed Khan",
-    amount: 45.5,
-    paymentMethod: "card",
-    status: "success",
-    date: "2026-07-01",
-    referenceNumber: "REF-784512",
-    userRole: "admin",
-  },
-];
-```
+- Include at least 10 sample transactions.
+- Use realistic POS-related data.
+- Include all three roles across the dataset:
+  - admin
+  - merchant
+  - support
 
 ---
 
 ## Styling Guidelines
 
-Use Tailwind CSS.
-
-Style direction:
-
-- Clean admin dashboard look
-- Light background
-- White cards
-- Soft shadows
-- Rounded corners
-- Simple sidebar
-- Professional spacing
-
-Suggested colors:
-
-- Background: `bg-slate-100`
-- Cards: `bg-white`
-- Primary buttons: `bg-blue-600 text-white`
-- Success status: green
-- Pending status: yellow
-- Failed status: red
-
----
-
-## Component Requirements
-
-### SummaryCard
-
-File:
-
-```txt
-src/components/dashboard/SummaryCard.tsx
-```
-
-Props:
-
-```ts
-interface SummaryCardProps {
-  title: string;
-  value: string | number;
-  subtitle?: string;
-}
-```
-
----
-
-### TransactionStatusBadge
-
-File:
-
-```txt
-src/components/transactions/TransactionStatusBadge.tsx
-```
-
-Requirements:
-
-- Accept status as prop
-- Display colored badge:
-  - success = green
-  - pending = yellow
-  - failed = red
-
----
-
-### TransactionFilters
-
-File:
-
-```txt
-src/components/transactions/TransactionFilters.tsx
-```
-
-Requirements:
-
-- Search input
-- Status dropdown
-- Accept values and change handlers as props
-
----
-
-### TransactionTable
-
-File:
-
-```txt
-src/components/transactions/TransactionTable.tsx
-```
-
-Requirements:
-
-- Accept transactions as prop
-- Render table rows
-- Include link to transaction details page
-
----
-
-### Button
-
-File:
-
-```txt
-src/components/common/Button.tsx
-```
-
-Requirements:
-
-- Simple reusable button component
-- Accept children, type, and onClick props
-- Keep styling simple
+- Use Tailwind CSS.
+- Use a clean admin dashboard look.
+- Use light page backgrounds.
+- Use white content cards.
+- Use soft shadows and subtle borders.
+- Use rounded corners consistently.
+- Keep the sidebar simple.
+- Keep spacing professional and readable.
+- Use responsive grids that allow cards to wrap to new rows.
+- Dashboard cards and chart cards must stay within the visible page width.
+- Chart overflow, if needed for dense daily data, should be contained inside the chart area only.
+- Use `bg-blue-600 text-white` for primary buttons.
+- Use green for success, yellow for pending, and red for failed statuses.
 
 ---
 
 ## Utility Function
 
-File:
-
-```txt
-src/utils/formatCurrency.ts
-```
-
-Create a helper function:
+File: `src/utils/formatCurrency.ts`
 
 ```ts
 export function formatCurrency(amount: number) {
@@ -530,16 +377,18 @@ Use this for all amount displays.
 
 ## Expected User Flow
 
-1. User opens app at `/`
-2. User sees login page
-3. User clicks login
-4. User is redirected to dashboard
-5. User sees payment summary cards
-6. User opens transactions page
-7. User searches or filters transactions
-8. User views a transaction details page
-9. User opens add transaction page
-10. User submits a test transaction form
+1. User opens app at `/`.
+2. User sees login page.
+3. User clicks Login.
+4. User is redirected to Dashboard.
+5. User sees payment summary cards.
+6. User opens Transactions page.
+7. User searches or filters transactions.
+8. User views a transaction details page.
+9. User goes back to Transactions.
+10. User clicks Add transaction.
+11. User submits a test transaction from the modal.
+12. User can logout from the header.
 
 ---
 
@@ -547,118 +396,40 @@ Use this for all amount displays.
 
 The frontend milestone is complete when:
 
-- App runs successfully using `npm run dev`
-- Tailwind CSS styling works
-- All required pages exist
-- All required routes work
-- Sidebar navigation works
-- Dashboard summary values are calculated from mock data
-- Transaction table displays mock data
-- Search works
-- Status filter works
-- Transaction details route works
-- Add transaction form UI exists
-- Code is organized using the required folder structure
-- No backend is required to run the app
+- App runs successfully using `npm run dev`.
+- App builds successfully using `npm run build`.
+- App lints successfully using `npm run lint`.
+- Tailwind CSS styling works.
+- Login page works with mock navigation.
+- Dashboard summary values are calculated from mock data.
+- Dashboard charts show transaction count, transaction amount in tooltips, status breakdowns, and year/month filtering.
+- Dashboard transaction chart shows only one `Transactions` line.
+- Dashboard transaction chart changes grouping and X-axis title correctly for yearly, monthly, and daily views.
+- Dashboard cards and chart cards do not cause page-level horizontal overflow on desktop, tablet, or mobile.
+- Sidebar navigation works.
+- Transaction table displays mock data.
+- Search works.
+- Status filter works.
+- Pagination works after search, status filters, and rows-per-page changes are applied.
+- Transaction details route works.
+- Missing transaction fallback works.
+- Add transaction modal opens from the Transactions page.
+- Add transaction modal submits with alert or console log.
+- Add transaction modal can close through Cancel, close button, backdrop click, and Escape.
+- Logout navigates back to `/`.
+- Code is organized using the current folder structure.
+- No backend is required to run the app.
 
 ---
 
-## Commands
+## Future Improvements
 
-Use these commands to create and run the project:
+- Connect frontend to a real Express API.
+- Add real authentication using JWT.
+- Store users and transactions in a database.
+- Add role-based access control.
+- Add create-transaction persistence.
+- Improve modal focus trapping for accessibility.
+- Deploy frontend and backend online.
 
-```bash
-npm create vite@latest paytrack-dashboard -- --template react-ts
-cd paytrack-dashboard
-npm install
-npm install react-router-dom
-npm install -D tailwindcss @tailwindcss/vite
-npm run dev
-```
-
----
-
-## Tailwind Setup Note
-
-Use the current Tailwind CSS setup for Vite.
-
-Configure Tailwind according to the installed version.
-
-Make sure Tailwind styles are imported in:
-
-```txt
-src/index.css
-```
-
----
-
-## First Implementation Order
-
-Build in this order:
-
-1. Install React + TypeScript + Tailwind
-2. Create folder structure
-3. Add transaction types
-4. Add mock transaction data
-5. Set up routes
-6. Create layout components
-7. Create login page
-8. Create dashboard page
-9. Create transaction list page
-10. Create transaction details page
-11. Create add transaction page
-12. Polish styling
-
----
-
-## Git Commit Suggestions
-
-Use these commit messages by milestone:
-
-```bash
-git add .
-git commit -m "Initialize React TypeScript project"
-
-git add .
-git commit -m "Set up Tailwind CSS and app structure"
-
-git add .
-git commit -m "Add mock transaction data and types"
-
-git add .
-git commit -m "Create dashboard layout and routes"
-
-git add .
-git commit -m "Build login and dashboard pages"
-
-git add .
-git commit -m "Build transaction list and filters"
-
-git add .
-git commit -m "Add transaction details page"
-
-git add .
-git commit -m "Add test transaction form"
-
-git add .
-git commit -m "Polish PayTrack dashboard UI"
-```
-
----
-
-## Important Notes for Codex
-
-When generating code:
-
-- Do not skip files from the required folder structure.
-- Do not replace React Router with another routing library.
-- Do not add backend logic yet.
-- Do not add database logic yet.
-- Do not add real JWT authentication yet.
-- Do not install unnecessary packages.
-- Keep each component small and understandable.
-- Prioritize working code over complex architecture.
-- Use TypeScript correctly.
-- Make sure imports use the correct relative paths.
-- Avoid huge components.
-- Keep styling consistent across pages.
+Phase 2 backend planning is tracked in `PHASE_2_BACKEND_SPEC.md`.

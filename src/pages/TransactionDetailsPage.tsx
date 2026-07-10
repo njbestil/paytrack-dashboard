@@ -35,13 +35,15 @@ function TransactionDetailsPage() {
 
   return (
     <section className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-950">Transaction Details</h2>
           <p className="mt-1 text-sm text-slate-500">Review a single POS payment record.</p>
         </div>
         <Link to="/transactions">
-          <Button type="button">Back to transactions</Button>
+          <Button type="button" className="w-full sm:w-auto">
+            Back to transactions
+          </Button>
         </Link>
       </div>
 

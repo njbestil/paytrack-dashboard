@@ -1,13 +1,29 @@
-import { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { demoUser, isDemoUserLoggedIn, loginWithDemoCredentials } from "../auth/demoAuth";
 import Button from "../components/common/Button";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState(demoUser.email);
+  const [password, setPassword] = useState(demoUser.password);
+  const [errorMessage, setErrorMessage] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const loginSucceeded = loginWithDemoCredentials(email, password);
+
+    if (!loginSucceeded) {
+      setErrorMessage("Please use the demo email and password.");
+      return;
+    }
+
     navigate("/dashboard");
+  }
+
+  if (isDemoUserLoggedIn()) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
@@ -28,7 +44,8 @@ function LoginPage() {
             <span className="mb-1 block text-sm font-medium text-slate-700">Email</span>
             <input
               type="email"
-              defaultValue="admin@paytrack.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </label>
@@ -37,10 +54,17 @@ function LoginPage() {
             <span className="mb-1 block text-sm font-medium text-slate-700">Password</span>
             <input
               type="password"
-              defaultValue="password123"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </label>
+
+          {errorMessage ? (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+              {errorMessage}
+            </p>
+          ) : null}
 
           <Button type="submit" className="w-full">
             Login

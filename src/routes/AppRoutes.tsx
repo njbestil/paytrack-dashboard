@@ -1,10 +1,23 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import type { ReactNode } from "react";
+import { isDemoUserLoggedIn } from "../auth/demoAuth";
 import AppLayout from "../components/layout/AppLayout";
-import AddTransactionPage from "../pages/AddTransactionPage";
 import DashboardPage from "../pages/DashboardPage";
 import LoginPage from "../pages/LoginPage";
 import TransactionDetailsPage from "../pages/TransactionDetailsPage";
 import TransactionsPage from "../pages/TransactionsPage";
+
+interface ProtectedPageProps {
+  children: ReactNode;
+}
+
+function ProtectedPage({ children }: ProtectedPageProps) {
+  if (!isDemoUserLoggedIn()) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 function AppRoutes() {
   return (
@@ -13,33 +26,32 @@ function AppRoutes() {
       <Route
         path="/dashboard"
         element={
-          <AppLayout>
-            <DashboardPage />
-          </AppLayout>
+          <ProtectedPage>
+            <AppLayout>
+              <DashboardPage />
+            </AppLayout>
+          </ProtectedPage>
         }
       />
       <Route
         path="/transactions"
         element={
-          <AppLayout>
-            <TransactionsPage />
-          </AppLayout>
+          <ProtectedPage>
+            <AppLayout>
+              <TransactionsPage />
+            </AppLayout>
+          </ProtectedPage>
         }
       />
-      <Route
-        path="/transactions/add"
-        element={
-          <AppLayout>
-            <AddTransactionPage />
-          </AppLayout>
-        }
-      />
+      <Route path="/transactions/add" element={<Navigate to="/transactions" replace />} />
       <Route
         path="/transactions/:id"
         element={
-          <AppLayout>
-            <TransactionDetailsPage />
-          </AppLayout>
+          <ProtectedPage>
+            <AppLayout>
+              <TransactionDetailsPage />
+            </AppLayout>
+          </ProtectedPage>
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />

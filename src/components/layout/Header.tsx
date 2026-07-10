@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { logoutDemoUser } from "../../auth/demoAuth";
 
 function Header() {
   const navigate = useNavigate();
 
   function handleLogout() {
+    logoutDemoUser();
     navigate("/");
   }
 
@@ -18,8 +20,7 @@ function Header() {
 
       <div className="flex items-center gap-3">
         <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-          <p className="text-sm font-semibold text-slate-950">Admin User</p>
-          <p className="text-xs uppercase text-slate-500">admin</p>
+          <p className="text-sm font-semibold text-slate-950">Hello, Admin User</p>
         </div>
 
         <button

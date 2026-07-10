@@ -9,7 +9,7 @@ interface TransactionTableProps {
 
 function TransactionTable({ transactions }: TransactionTableProps) {
   return (
-    <div className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
+    <>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200">
           <thead className="bg-slate-50">
@@ -50,7 +50,7 @@ function TransactionTable({ transactions }: TransactionTableProps) {
       {transactions.length === 0 ? (
         <p className="px-4 py-8 text-center text-sm text-slate-500">No transactions found.</p>
       ) : null}
-    </div>
+    </>
   );
 }
 
